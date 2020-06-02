@@ -1,22 +1,20 @@
-# Docker Image which is used as foundation to create
-# a custom Docker Image with this Dockerfile
+
 FROM node:10
 
-# A directory within the virtualized Docker environment
-# Becomes more relevant when using Docker Compose later
-WORKDIR /usr/src/app
+RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
-# Copies package.json and package-lock.json to Docker environment
+WORKDIR /home/node/app
+
 COPY package*.json ./
 
-# Installs all node packages
 RUN npm install
 
-# Copies everything over to Docker environment
 COPY . .
 
-# Uses port which is used by the actual application
+COPY --chown=node:node . .
+
+USER node
+
 EXPOSE 3000
 
-# Finally runs the application
 CMD [ "npm", "start" ]
