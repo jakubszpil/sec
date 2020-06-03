@@ -20,11 +20,7 @@ import {
   TableToolbarSearch,
   Button,
 } from 'carbon-components-react';
-import {
-  Delete32 as Delete,
-  Save32 as Save,
-  Download32 as Download,
-} from '@carbon/icons-react';
+import { Run32 as RunIcon } from '@carbon/icons-react';
 
 function getHeaders(item = {}) {
   const capitalize = (name) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -66,7 +62,7 @@ const triggerFunction = async (type = String, selected = Array) => {
   const conf = window.confirm(`Are sure to trigger ${type}?`);
   if (conf) {
     const response = await axios.post(
-      'http://192.168.99.100:8000/',
+      'http://192.168.99.100:8000/scan/' + type,
       selected.map(({ cells = Array }) => {
         let row = {};
         cells.forEach((cell) => {
@@ -77,9 +73,11 @@ const triggerFunction = async (type = String, selected = Array) => {
         return row;
       })
     );
-    const status = await response.data;
-    console.log('Your data: ');
-    console.log(status);
+    const images = await response.data;
+    images.forEach(({ name, send, type }) => {
+      alert(`Image ${name} has${send ? '' : ' not'} been sent`);
+    });
+    console.log(images);
   }
 };
 
@@ -94,112 +92,114 @@ export default function () {
   }, [data]);
   return (
     <div>
-      <DataTable
-        rows={data}
-        headers={headers}
-        render={({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getSelectionProps,
-          getBatchActionProps,
-          onInputChange,
-          selectedRows,
-        }) => (
-          <TableContainer title="DataTable with batch actions">
-            <TableToolbar>
-              <TableBatchActions {...getBatchActionProps()}>
-                <TableBatchAction
-                  tabIndex={
-                    getBatchActionProps().shouldShowBatchActions ? 0 : -1
-                  }
-                  renderIcon={Delete}
-                  onClick={() => triggerFunction('delete', selectedRows)}
-                >
-                  Delete
-                </TableBatchAction>
-                <TableBatchAction
-                  tabIndex={
-                    getBatchActionProps().shouldShowBatchActions ? 0 : -1
-                  }
-                  renderIcon={Save}
-                  onClick={() => triggerFunction('save', selectedRows)}
-                >
-                  Save
-                </TableBatchAction>
-                <TableBatchAction
-                  tabIndex={
-                    getBatchActionProps().shouldShowBatchActions ? 0 : -1
-                  }
-                  renderIcon={Download}
-                  onClick={() => triggerFunction('download', selectedRows)}
-                >
-                  Download
-                </TableBatchAction>
-              </TableBatchActions>
-              <TableToolbarContent>
-                <TableToolbarSearch
-                  tabIndex={
-                    getBatchActionProps().shouldShowBatchActions ? -1 : 0
-                  }
-                  onChange={onInputChange}
-                />
-                <TableToolbarMenu
-                  tabIndex={
-                    getBatchActionProps().shouldShowBatchActions ? -1 : 0
-                  }
-                >
-                  <TableToolbarAction
-                    primaryFocus
-                    onClick={() => alert('Alert 1')}
+      {data !== [] && (
+        <DataTable
+          rows={data}
+          headers={headers}
+          render={({
+            rows,
+            headers,
+            getHeaderProps,
+            getRowProps,
+            getSelectionProps,
+            getBatchActionProps,
+            onInputChange,
+            selectedRows,
+          }) => (
+            <TableContainer title="DataTable with batch actions">
+              <TableToolbar>
+                <TableBatchActions {...getBatchActionProps()}>
+                  <TableBatchAction
+                    tabIndex={
+                      getBatchActionProps().shouldShowBatchActions ? 0 : -1
+                    }
+                    renderIcon={RunIcon}
+                    onClick={() => triggerFunction('oss', selectedRows)}
                   >
-                    Action 1
-                  </TableToolbarAction>
-                  <TableToolbarAction onClick={() => alert('Alert 2')}>
-                    Action 2
-                  </TableToolbarAction>
-                  <TableToolbarAction onClick={() => alert('Alert 3')}>
-                    Action 3
-                  </TableToolbarAction>
-                </TableToolbarMenu>
-                <Button
-                  tabIndex={
-                    getBatchActionProps().shouldShowBatchActions ? -1 : 0
-                  }
-                  onClick={() => console.log('clicked')}
-                  size="small"
-                  kind="primary"
-                >
-                  Add new
-                </Button>
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableSelectAll {...getSelectionProps()} />
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })}>
-                    <TableSelectRow {...getSelectionProps({ row })} />
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
+                    OSS
+                  </TableBatchAction>
+                  <TableBatchAction
+                    tabIndex={
+                      getBatchActionProps().shouldShowBatchActions ? 0 : -1
+                    }
+                    renderIcon={RunIcon}
+                    onClick={() => triggerFunction('va', selectedRows)}
+                  >
+                    VA
+                  </TableBatchAction>
+                  <TableBatchAction
+                    tabIndex={
+                      getBatchActionProps().shouldShowBatchActions ? 0 : -1
+                    }
+                    renderIcon={RunIcon}
+                    onClick={() => triggerFunction('static', selectedRows)}
+                  >
+                    Static
+                  </TableBatchAction>
+                </TableBatchActions>
+                <TableToolbarContent>
+                  <TableToolbarSearch
+                    tabIndex={
+                      getBatchActionProps().shouldShowBatchActions ? -1 : 0
+                    }
+                    onChange={onInputChange}
+                  />
+                  <TableToolbarMenu
+                    tabIndex={
+                      getBatchActionProps().shouldShowBatchActions ? -1 : 0
+                    }
+                  >
+                    <TableToolbarAction
+                      primaryFocus
+                      onClick={() => alert('Alert 1')}
+                    >
+                      Action 1
+                    </TableToolbarAction>
+                    <TableToolbarAction onClick={() => alert('Alert 2')}>
+                      Action 2
+                    </TableToolbarAction>
+                    <TableToolbarAction onClick={() => alert('Alert 3')}>
+                      Action 3
+                    </TableToolbarAction>
+                  </TableToolbarMenu>
+                  <Button
+                    tabIndex={
+                      getBatchActionProps().shouldShowBatchActions ? -1 : 0
+                    }
+                    onClick={() => console.log('clicked')}
+                    size="small"
+                    kind="primary"
+                  >
+                    Add new
+                  </Button>
+                </TableToolbarContent>
+              </TableToolbar>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableSelectAll {...getSelectionProps()} />
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      />
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow {...getRowProps({ row })}>
+                      <TableSelectRow {...getSelectionProps({ row })} />
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        />
+      )}
     </div>
   );
 }
